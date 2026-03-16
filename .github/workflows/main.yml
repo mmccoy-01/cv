@@ -4,6 +4,10 @@ on:
   schedule:
      # Scheduled to run at midnight EST (5:00 UTC) every Sunday
     - cron: '0 5 * * 0'
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,8 +15,10 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_VERSION: '4.3.2'
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Install ICU and other dependencies
         run: |
