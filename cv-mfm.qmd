@@ -1,0 +1,316 @@
+---
+params:
+  audience: academia
+format:
+  pdf:
+    toc: false
+    number-sections: false
+    colorlinks: true
+    documentclass: scrartcl
+    papersize: letter
+    pdf-engine: xelatex
+    fontsize: 10pt
+    geometry:
+      - margin=1in
+      - heightrounded
+    include-in-header:
+      - preamble.tex
+execute:
+  warning: false
+  echo: false
+  message: false
+  eval: true
+---
+
+```{r}
+#| name: setup
+#| include: false
+#| message: false
+#| eval: true
+
+knitr::opts_chunk$set(
+  fig.path = "figs/",
+  fig.width = 7.252,
+  fig.height = 4,
+  comment = "#>",
+  fig.retina = 3
+)
+
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(kableExtra)
+
+source("functions.R")
+
+escape_latex_text <- function(x) {
+  x <- as.character(x)
+  x <- stringr::str_replace_all(x, fixed("\\"), "\\\\textbackslash{}")
+  x <- stringr::str_replace_all(x, "([#$%&_{}])", "\\\\\\1")
+  x <- stringr::str_replace_all(x, fixed("~"), "\\\\textasciitilde{}")
+  x <- stringr::str_replace_all(x, fixed("^"), "\\\\textasciicircum{}")
+  x
+}
+```
+
+\par\centering{\LARGE{Michael F. McCoy III}}
+\par\centering{PhD Student in Translational Biomedical Sciences (Neuroscience)}
+\vspace{-5pt}
+\par\centering{Rowan University}
+\vspace{-5pt}
+\par\centering{Virtua Health College of Medicine \& Life Sciences}
+\vspace{-5pt}
+\par\centering{Stratford, NJ}
+\vspace{-5pt}
+\par\centering{{\large\Letter} mccoym43@rowan.edu}
+\vspace{-5pt}
+\par\centering{\href{https://www.linkedin.com/in/themichaelmccoy}{LinkedIn} | \href{https://github.com/mmccoy-01}{GitHub}}
+
+\vspace{-10pt}
+
+# Education
+
+\vspace{-10pt}
+
+\begin{longtable}{p{2.8cm} p{13cm}}
+
+2025--Present &
+\textbf{Ph.D. in Translational Biomedical Sciences (Neuroscience)}, Rowan University, Stratford, NJ \\[8pt]
+
+2022 & \textbf{B.A. in Psychology}, Minor in Neuroscience, Honors Program, Arcadia University, Glenside, PA \\
+     & \hspace{1.5em}Study Abroad, University of Stirling, Stirling, Scotland, UK (2019) \\
+
+\end{longtable}
+
+\vspace{-15pt}
+
+# Research Interests
+- Cancer immunotherapy and leukemia biology: cellular mechanisms underlying targeted therapies in B-ALL and T-ALL.
+
+- Hedgehog signaling and sensory biology: signaling mechanisms in taste/tongue systems and epithelial-neural communication.
+
+- Behavioral neuroscience: body perception, cognition, and rodent behavioral paradigms.
+
+- Translational biomedical research: integrating wet-lab experimentation with computational research workflows and reproducible data tools.
+
+\vspace{-15pt}
+
+# Research Experience
+
+\vspace{-10pt}
+
+\begin{longtable}{p{2.8cm} p{13cm}}
+
+2023--2025 &
+\textbf{Research Technician III}, Children's Hospital of Philadelphia \\
+& PI: David T. Teachey and Caroline J. Diorio \\
+& Conducted survival and bioluminescent imaging studies to track progression of targeted B-cell and T-cell therapies in acute lymphoblastic leukemia using patient-derived xenograft models in immunocompromised mice. Developed interactive R Shiny / Quarto dashboards to document experimental workflows and monitor treatment efficacy and disease progression. \\[8pt]
+
+2022--2023 &
+\textbf{Laboratory Animal Caretaker}, Children's Hospital of Philadelphia, Department of Veterinary Resources \\
+& Maintained AALAS and AAALAC standards for research animal care and husbandry, conducted daily welfare checks, and supported SOP/GLP-compliant animal facility operations involving mice, rats, sheep, and pigs. \\[8pt]
+
+2020--2022 &
+\textbf{Research Assistant}, Rodent Altruism and Psycho-Pharmacology Lab, Arcadia University \\
+& PI: Logan J. Fields and Juan F. Duque \\
+& Administered oral cannabidiol treatments in rodent models of early-life stress, developed SOPs for open field and novel object recognition tasks, and contributed to IACUC protocol development and approval. \\[8pt]
+
+2020 &
+\textbf{Animal Care Staff}, Arcadia University \\
+& Provided hands-on husbandry for laboratory rats, including handling, bedding changes, weighing, and feeding. \\
+
+\end{longtable}
+
+\vspace{-15pt}
+
+# Publications
+<!-- Set spacing in between list -->
+\apptocmd{\tightlist}{\setlength{\itemsep}{4pt}}{}{}
+
+```{r}
+pubs <- get_cv_sheet("pubs") %>%
+  mutate(
+    year_num = year,
+    year = ifelse(is.na(year), "", paste0("(", year, ")")),
+    journal = ifelse(is.na(journal), "", paste0("_", journal, "_")),
+    number = ifelse(is.na(number), "", paste0(number, ".")),
+    doi = ifelse(
+      is.na(doi) | doi == "",
+      "",
+      paste0("DOI: [", doi, "](https://doi.org/", doi, ")")
+    ),
+    citation = str_squish(
+      paste(author, year, enquote(title), journal, number, doi)
+    )
+  )
+```
+
+## A. Refereed Journal Articles
+```{r}
+#| results: asis
+
+pubs %>%
+  filter(category == "peer_reviewed") %>%
+  arrange(desc(year)) %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+## B. Research Projects
+```{r}
+#| results: asis
+
+pubs %>%
+  filter(category == "working") %>%
+  mutate(
+    citation = str_squish(paste(author, enquote(title), journal))
+  ) %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+## C. Thesis
+```{r}
+#| results: asis
+
+pubs %>%
+  filter(category == "theses") %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+# Presentations
+```{r}
+presentations <- get_cv_sheet("presentations") %>%
+  mutate(across(where(is.character), escape_latex_text)) %>%
+  arrange(desc(date)) %>%
+  mutate(
+    with = ifelse(is.na(with), "", paste0(" With ", with, ".")),
+    date = format(as.Date(date), "%B %d, %Y"),
+    citation = paste0(
+      enquote(title), ".", with, " ",
+      host, ", ", location, ". ", date, "."
+    )
+  )
+
+presentation_counts <- presentations %>%
+  count(category) %>%
+  mutate(
+    category = recode(
+      category,
+      poster = "Poster Presentations",
+      conference = "Conference Presentations",
+      invited = "Invited Talks"
+    ),
+    cite = paste0(category, " (", n, ")")
+  ) %>%
+  pull(cite) %>%
+  paste(collapse = ", ")
+```
+
+**Total Presentations by Category**: `r presentation_counts`
+
+## A. Conference Presentations
+```{r}
+#| results: asis
+
+presentations %>%
+  filter(category == "conference") %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+## B. Poster Presentations
+```{r}
+#| results: asis
+
+presentations %>%
+  filter(category == "poster") %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+# Honors / Awards
+```{r}
+awards <- get_cv_sheet("awards") %>%
+  mutate(
+    date_sort = lubridate::my(date),
+    across(where(is.character), escape_latex_text),
+    citation = paste0(description, " (", date, ")")
+  ) %>%
+  arrange(desc(date_sort)) %>%
+  select(-date_sort)
+```
+
+```{r}
+#| results: asis
+
+awards %>%
+  pull(citation) %>%
+  make_bullet_list()
+```
+
+# Teaching Experience
+```{r}
+classes <- get_cv_sheet("classes") %>%
+  mutate(
+    semester = recode(
+      semester,
+      "F20" = "Fall 2020",
+      "S21" = "Spring 2021",
+      "F21" = "Fall 2021",
+      "S22" = "Spring 2022"
+    ),
+    role = recode(type, assistant = "Teaching Assistant"),
+    course = name
+  ) %>%
+  select(Semester = semester, Role = role, Course = course, Level = level) %>%
+  mutate(across(everything(), escape_latex_text))
+
+classes %>%
+  kbl(booktabs = TRUE, linesep = "") %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+# Service and Community Involvement
+```{r}
+service <- get_cv_sheet("service") %>%
+  mutate(across(where(is.character), escape_latex_text)) %>%
+  mutate(citation = paste0(activity, " (", dates, ")."))
+```
+
+## A. University Service
+```{r}
+#| results: asis
+
+service %>%
+  filter(category == "university") %>%
+  pull(citation) %>%
+  make_bullet_list()
+```
+
+## B. Community / Professional Involvement
+```{r}
+#| results: asis
+
+service %>%
+  filter(category == "professional") %>%
+  pull(citation) %>%
+  make_bullet_list()
+```
+
+# Skills
+
+- Data Analysis: R, SPSS, JASP, jamovi, FlowJo; t-tests, ANOVA, linear regression
+
+- Programming / Reproducible Research: R, Python, SQL, Markdown, Quarto, Git/GitHub
+
+- Molecular & Cellular Techniques: Flow cytometry; DNA/RNA/protein extraction; PCR; gel electrophoresis; ELISA
+
+- Histology & Imaging: Tissue processing, cryosectioning, microtomy, immunohistochemistry, fluorescent immunostaining, fluorescence imaging
+
+- In Vivo / Murine Techniques: IP, IV, and intragastric injections; retro-orbital bleeding; necropsy; spleen and bone marrow harvest; ABSL-2 sterile hood technique
+
+- Research Platforms: IVIS Spectrum, EthoVision XT, Qualtrics, SONA, Microsoft Office, VS Code, Zotero, EndNote, Notion, Obsidian, Canvas
+
+- Research Data Management: R/Quarto dashboards with Plotly and Shiny for workflow tracking and experimental documentation
