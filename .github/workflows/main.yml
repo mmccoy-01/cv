@@ -1,8 +1,9 @@
 name: Render Quarto PDF
+
 on:
   push:
   schedule:
-     # Scheduled to run at midnight EST (5:00 UTC) every Sunday
+    # Midnight EST / 5:00 UTC every Sunday
     - cron: '0 5 * * 0'
 
 permissions:
@@ -11,19 +12,21 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_VERSION: '4.3.2'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Install ICU and other dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libicu-dev libcurl4-openssl-dev r-base
+          sudo apt-get install -y libicu-dev libcurl4-openssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
 
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -34,33 +37,41 @@ jobs:
           r-version: ${{ env.R_VERSION }}
           use-public-rspm: true
 
-      - name: Query R package dependencies
-        run: |
-          install.packages(c('remotes', 'here'))
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
       - name: Cache R packages
         uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ env.R_VERSION }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ env.R_VERSION }}-1-
+          key: "${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-v2"
+          restore-keys: |
+            ${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-
 
-      - name: Install R dependencies
-        run: |
-          install.packages("stringi", configure.args = "--with-icudt-system=yes")
-          remotes::install_deps(dependencies = TRUE)
-          install.packages("pkgdown")
+      - name: Install R packages
         shell: Rscript {0}
+        run: |
+          install.packages(
+            c(
+              "knitr",
+              "dplyr",
+              "stringr",
+              "lubridate",
+              "kableExtra",
+              "googlesheets4",
+              "xml2",
+              "rvest",
+              "pander",
+              "stringi",
+              "pkgdown"
+            ),
+            repos = "https://cloud.r-project.org"
+          )
 
       - name: Install TinyTeX
+        shell: bash
         run: |
           wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
-          echo "PATH=$HOME/.TinyTeX/bin/x86_64-linux:$PATH" >> $GITHUB_ENV
+          echo "$HOME/.TinyTeX/bin/x86_64-linux" >> $GITHUB_PATH
 
-      - name: Install LaTeX Packages with TinyTeX
+      - name: Install LaTeX packages
         run: |
           tlmgr install marvosym parskip fancyhdr lastpage xecjk hyperref xcolor
 
@@ -68,12 +79,12 @@ jobs:
         run: |
           quarto render cv-mfm.qmd --to pdf
 
-      - name: Set up Git Config
+      - name: Set up Git config
         run: |
-          git config --global user.name 'Michael McCoy'
-          git config --global user.email 'mccoym43@rowan.edu'
+          git config --global user.name "Michael McCoy"
+          git config --global user.email "mccoym43@rowan.edu"
 
-      - name: Commit and Push PDF
+      - name: Commit and push PDF
         run: |
           git add cv-mfm.pdf
           git commit -m "Update rendered PDF" || echo "No changes to commit"
