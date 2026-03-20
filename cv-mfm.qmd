@@ -146,7 +146,6 @@ pubs <- get_cv_sheet("pubs") %>%
   )
 ```
 
-## A. Refereed Journal Articles
 ```{r}
 #| results: asis
 
@@ -157,7 +156,7 @@ pubs %>%
   make_ordered_list()
 ```
 
-## B. Research Projects
+# Research Projects
 ```{r}
 #| results: asis
 
@@ -170,7 +169,7 @@ pubs %>%
   make_ordered_list()
 ```
 
-## C. Thesis
+# Thesis
 ```{r}
 #| results: asis
 
@@ -199,19 +198,41 @@ presentation_counts <- presentations %>%
   mutate(
     category = recode(
       category,
-      poster = "Poster Presentations",
+      invited = "Invited Talks",
       conference = "Conference Presentations",
-      invited = "Invited Talks"
+      poster = "Poster Presentations"
+    )
+  ) %>%
+  mutate(
+    category = factor(
+      category,
+      levels = c(
+        "Invited Talks",
+        "Conference Presentations",
+        "Poster Presentations"
+      )
     ),
     cite = paste0(category, " (", n, ")")
   ) %>%
+  arrange(category) %>%
   pull(cite) %>%
   paste(collapse = ", ")
 ```
 
 **Total Presentations by Category**: `r presentation_counts`
 
-## A. Conference Presentations
+## A. Invited Talks
+
+```{r}
+#| results: asis
+
+presentations %>%
+  filter(category == "invited") %>%
+  pull(citation) %>%
+  make_ordered_list()
+```
+
+## B. Conference Presentations
 ```{r}
 #| results: asis
 
@@ -221,7 +242,7 @@ presentations %>%
   make_ordered_list()
 ```
 
-## B. Poster Presentations
+## C. Poster Presentations
 ```{r}
 #| results: asis
 
