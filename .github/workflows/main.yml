@@ -56,32 +56,50 @@ jobs:
           use-public-rspm: true
 
       - name: Cache R packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: "${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-v2"
+          key: "${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-v4"
           restore-keys: |
             ${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-
 
       - name: Install R packages
-        shell: Rscript {0}
+        shell: bash
         run: |
-          install.packages(
-            c(
-              "knitr",
-              "rmarkdown",
-              "dplyr",
-              "stringr",
-              "lubridate",
-              "kableExtra",
-              "googlesheets4",
-              "xml2",
-              "rvest",
-              "pander",
-              "stringi"
-            ),
-            repos = "https://cloud.r-project.org"
-          )
+          mkdir -p "$R_LIBS_USER"
+
+          Rscript -e '
+            cat("R library paths before install:\n")
+            print(.libPaths())
+
+            install.packages(
+              c(
+                "knitr",
+                "rmarkdown",
+                "dplyr",
+                "stringr",
+                "lubridate",
+                "kableExtra",
+                "googlesheets4",
+                "xml2",
+                "rvest",
+                "pander",
+                "stringi"
+              ),
+              lib = Sys.getenv("R_LIBS_USER"),
+              repos = "https://cloud.r-project.org"
+            )
+
+            cat("R library paths after install:\n")
+            print(.libPaths())
+
+            cat("Checking required packages:\n")
+            stopifnot(requireNamespace("rmarkdown", quietly = TRUE))
+            stopifnot(requireNamespace("knitr", quietly = TRUE))
+
+            cat("rmarkdown version:", as.character(packageVersion("rmarkdown")), "\n")
+            cat("knitr version:", as.character(packageVersion("knitr")), "\n")
+          '
 
       - name: Install TinyTeX
         shell: bash
@@ -94,7 +112,11 @@ jobs:
           tlmgr install marvosym parskip fancyhdr lastpage xecjk hyperref xcolor
 
       - name: Render PDF
+        shell: bash
         run: |
+          Rscript -e 'cat("rmarkdown available:", requireNamespace("rmarkdown", quietly = TRUE), "\n")'
+          Rscript -e 'cat("rmarkdown version:", as.character(packageVersion("rmarkdown")), "\n")'
+          quarto check
           quarto render cv-mfm.qmd --to pdf
 
       - name: Set up Git config
