@@ -69,6 +69,7 @@ jobs:
           install.packages(
             c(
               "knitr",
+              "rmarkdown",
               "dplyr",
               "stringr",
               "lubridate",

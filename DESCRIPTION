@@ -3,12 +3,13 @@ Depends: R (>= 4.0.2)
 License: CC-BY-SA
 Encoding: UTF-8
 Imports:
-    dplyr,
-    googlesheets4,
-    kableExtra,
-    knitr,
-    lubridate,
-    pander,
-    rvest,
-    stringr,
-    xml2
+  dplyr,
+  googlesheets4,
+  kableExtra,
+  knitr,
+  rmarkdown,
+  lubridate,
+  pander,
+  rvest,
+  stringr,
+  xml2
