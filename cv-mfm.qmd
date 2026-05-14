@@ -79,20 +79,18 @@ escape_latex_text <- function(x) {
 \textbf{Ph.D. in Translational Biomedical Sciences (Neuroscience)}, Rowan University, Stratford, NJ \\[8pt]
 
 2022 & \textbf{B.A. in Psychology}, Minor in Neuroscience, Honors Program, Arcadia University, Glenside, PA \\
-     & \hspace{1.5em}Study Abroad, University of Stirling, Stirling, Scotland, UK (2019) \\
+     & \hspace{1.5em}Study Abroad, University of Stirling, Scotland, UK (Spring 2019) \\
 
 \end{longtable}
 
 \vspace{-15pt}
 
 # Research Interests
-- Cancer immunotherapy and leukemia biology: cellular mechanisms underlying targeted therapies in B-ALL and T-ALL.
 
-- Hedgehog signaling and sensory biology: signaling mechanisms in taste/tongue systems and epithelial-neural communication.
-
-- Behavioral neuroscience: body perception, cognition, and rodent behavioral paradigms.
-
-- Translational biomedical research: integrating wet-lab experimentation with computational research workflows and reproducible data tools.
+- Developmental and regenerative mechanisms regulating sensory and oral epithelial tissues, with current emphasis on Hedgehog signaling, Gas1 co-receptor function, and postnatal taste organ morphogenesis.
+- Tissue homeostasis and sensory dysfunction across development, aging, disease, and therapeutic intervention.
+- Translational biomedical models integrating rodent behavior, histology, immunofluorescence, molecular techniques, and reproducible computational workflows.
+- Prior work in cancer biology and therapeutic response, including targeted and immune-based therapies in B-ALL and T-ALL.
 
 \vspace{-15pt}
 
@@ -101,6 +99,11 @@ escape_latex_text <- function(x) {
 \vspace{-10pt}
 
 \begin{longtable}{p{2.8cm} p{13cm}}
+
+2026--Present &
+\textbf{PhD Student}, Kumari Lab, Rowan-Virtua School of Osteopathic Medicine \\
+& PI: Archana Kumari \\
+& Studying Gas1-dependent Hedgehog signaling during postnatal taste organ development, epithelial homeostasis, and sensory renewal using transgenic mouse models, histology, and immunofluorescence. Characterize region-specific effects on fungiform and circumvallate papillae through analyses of tissue morphology, epithelial proliferation, progenitor cell maintenance, and differentiated taste cell populations. \\[8pt]
 
 2023--2025 &
 \textbf{Research Technician III}, Children's Hospital of Philadelphia \\
@@ -156,7 +159,12 @@ pubs %>%
   make_ordered_list()
 ```
 
-# Research Projects
+# Selected Unpublished Research Projects
+
+*Studies and experiments I contributed to that were not formally published or presented.*
+
+\medskip
+
 ```{r}
 #| results: asis
 
@@ -219,7 +227,7 @@ presentation_counts <- presentations %>%
   paste(collapse = ", ")
 ```
 
-**Total Presentations by Category**: `r presentation_counts`
+**Total Presentations**: `r presentation_counts`
 
 ## A. Invited Talks
 
@@ -290,7 +298,7 @@ classes <- get_cv_sheet("classes") %>%
   mutate(across(everything(), escape_latex_text))
 
 classes %>%
-  kbl(booktabs = TRUE, linesep = "") %>%
+  kbl(booktabs = TRUE, linesep = "", escape = FALSE) %>%
   kable_styling(latex_options = c("hold_position", "striped"))
 ```
 
