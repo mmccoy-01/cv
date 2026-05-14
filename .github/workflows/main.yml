@@ -3,7 +3,6 @@ name: Render Quarto PDF and Deploy to GitHub Pages
 on:
   schedule:
     - cron: '7 0 * * 0'
-      timezone: 'America/New_York'
   workflow_dispatch:
 
 permissions:
@@ -26,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
         with:
           persist-credentials: true
 
@@ -56,51 +55,31 @@ jobs:
           r-version: ${{ env.R_VERSION }}
           use-public-rspm: true
 
-      - name: Cache R packages
-        uses: actions/cache@v5
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: "${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-v4"
-          restore-keys: |
-            ${{ runner.os }}-${{ env.R_VERSION }}-cv-pkgs-
+          packages: |
+            any::knitr
+            any::rmarkdown
+            any::dplyr
+            any::stringr
+            any::lubridate
+            any::kableExtra
+            any::googlesheets4
+            any::xml2
+            any::rvest
+            any::pander
+            any::stringi
+          cache-version: 1
 
-      - name: Install R packages
-        shell: bash
+      - name: Confirm R packages
+        shell: Rscript {0}
         run: |
-          mkdir -p "$R_LIBS_USER"
-
-          Rscript -e '
-            cat("R library paths before install:\n")
-            print(.libPaths())
-
-            install.packages(
-              c(
-                "knitr",
-                "rmarkdown",
-                "dplyr",
-                "stringr",
-                "lubridate",
-                "kableExtra",
-                "googlesheets4",
-                "xml2",
-                "rvest",
-                "pander",
-                "stringi"
-              ),
-              lib = Sys.getenv("R_LIBS_USER"),
-              repos = "https://cloud.r-project.org"
-            )
-
-            cat("R library paths after install:\n")
-            print(.libPaths())
-
-            cat("Checking required packages:\n")
-            stopifnot(requireNamespace("rmarkdown", quietly = TRUE))
-            stopifnot(requireNamespace("knitr", quietly = TRUE))
-
-            cat("rmarkdown version:", as.character(packageVersion("rmarkdown")), "\n")
-            cat("knitr version:", as.character(packageVersion("knitr")), "\n")
-          '
+          print(.libPaths())
+          stopifnot(requireNamespace("knitr", quietly = TRUE))
+          stopifnot(requireNamespace("rmarkdown", quietly = TRUE))
+          cat("knitr:", as.character(packageVersion("knitr")), "\n")
+          cat("rmarkdown:", as.character(packageVersion("rmarkdown")), "\n")
 
       - name: Install TinyTeX
         shell: bash
@@ -113,11 +92,7 @@ jobs:
           tlmgr install marvosym parskip fancyhdr lastpage xecjk hyperref xcolor
 
       - name: Render PDF
-        shell: bash
         run: |
-          Rscript -e 'cat("rmarkdown available:", requireNamespace("rmarkdown", quietly = TRUE), "\n")'
-          Rscript -e 'cat("rmarkdown version:", as.character(packageVersion("rmarkdown")), "\n")'
-          quarto check
           quarto render cv-mfm.qmd --to pdf
 
       - name: Set up Git config
