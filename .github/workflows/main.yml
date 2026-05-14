@@ -133,7 +133,7 @@ jobs:
             </style>
           </head>
           <body>
-            <iframe src="./cv-mfm.pdf" title="Curriculum Vitae"></iframe>
+            <iframe src="./cv-mfm.pdf?v=${GITHUB_RUN_ID}" title="Curriculum Vitae"></iframe>
           </body>
           </html>
           EOF
