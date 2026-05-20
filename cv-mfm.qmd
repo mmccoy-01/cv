@@ -227,8 +227,6 @@ presentation_counts <- presentations %>%
   paste(collapse = ", ")
 ```
 
-**Total Presentations**: `r presentation_counts`
-
 ## A. Invited Talks
 
 ```{r}
