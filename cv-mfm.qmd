@@ -341,4 +341,4 @@ service %>%
 
 - Research Platforms: IVIS Spectrum, EthoVision XT, Qualtrics, SONA, Microsoft Office, VS Code, Zotero, EndNote, Notion, Obsidian, Canvas
 
-- Research Data Management: R/Quarto dashboards with Plotly and Shiny for workflow tracking and experimental documentation
+- Research Data Management: SoftMouse for colony and animal records management; R/Quarto dashboards with Plotly and Shiny for workflow tracking and experimental documentation
