@@ -258,6 +258,16 @@ presentations %>%
   make_ordered_list()
 ```
 
+# Selected Research Software & Computational Tools
+
+- **[FigForge](https://github.com/mmccoy-01/figforge)** — *Python, Shiny for Python.* Developed a browser-based scientific figure workspace for non-destructive labeling and preparation of Western blots, gels, and other lane-based images, with reusable project files and publication-quality image export.
+
+- **[Reproducible Bioluminescent Imaging Experimental Workflow](https://github.com/mmccoy-01/bioluminescent_imaging_experimental_template)** — *R, Quarto, Shiny, renv.* Developed a modular framework integrating longitudinal imaging data, animal metadata, statistical analyses, visualization, and experimental documentation into reproducible interactive research dashboards.
+
+- **[Mouse Treatment-Arm Randomization Tool](https://github.com/mmccoy-01/arm_randomization)** — *R, Shiny.* Developed an interactive tool for assigning mice to experimental treatment groups while minimizing between- and within-group variation in bioluminescent disease burden to reduce allocation bias.
+
+- **[NIH RePORTER & PubMed Bibliography Pipeline](https://github.com/mmccoy-01/nih_reporter_bibliography_tool)** — *Python, Playwright.* Developed an automated pipeline for identifying related NIH-funded projects, retrieving associated publications, generating tidy research datasets, and exporting references in MEDLINE, RIS, and BibTeX formats.
+
 # Honors / Awards
 ```{r}
 awards <- get_cv_sheet("awards") %>%
