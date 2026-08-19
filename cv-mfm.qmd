@@ -132,7 +132,14 @@ escape_latex_text <- function(x) {
 \apptocmd{\tightlist}{\setlength{\itemsep}{4pt}}{}{}
 
 ```{r}
-pubs <- get_cv_sheet("pubs") %>%
+pubs <- get_cv_sheet("pubs")
+
+# Keep the CV render working even if the optional repository column is absent.
+if (!"url_repo" %in% names(pubs)) {
+  pubs$url_repo <- NA_character_
+}
+
+pubs <- pubs %>%
   mutate(
     year_num = year,
     year = ifelse(is.na(year), "", paste0("(", year, ")")),
@@ -143,8 +150,13 @@ pubs <- get_cv_sheet("pubs") %>%
       "",
       paste0("DOI: [", doi, "](https://doi.org/", doi, ")")
     ),
+    repo_link = ifelse(
+      is.na(url_repo) | trimws(url_repo) == "",
+      "",
+      paste0("[GitHub](", trimws(url_repo), ")")
+    ),
     citation = str_squish(
-      paste(author, year, enquote(title), journal, number, doi)
+      paste(author, year, enquote(title), journal, number, doi, repo_link)
     )
   )
 ```
@@ -189,15 +201,28 @@ pubs %>%
 
 # Presentations
 ```{r}
-presentations <- get_cv_sheet("presentations") %>%
-  mutate(across(where(is.character), escape_latex_text)) %>%
+presentations <- get_cv_sheet("presentations")
+
+# Keep the CV render working even if the optional repository column is absent.
+if (!"url_repo" %in% names(presentations)) {
+  presentations$url_repo <- NA_character_
+}
+
+presentations <- presentations %>%
+  # Escape display text for LaTeX, but leave repository URLs untouched.
+  mutate(across(where(is.character) & !matches("^url_repo$"), escape_latex_text)) %>%
   arrange(desc(date)) %>%
   mutate(
     with = ifelse(is.na(with), "", paste0(" With ", with, ".")),
     date = format(as.Date(date), "%B %d, %Y"),
+    repo_link = ifelse(
+      is.na(url_repo) | trimws(url_repo) == "",
+      "",
+      paste0(" [GitHub](", trimws(url_repo), ")")
+    ),
     citation = paste0(
       enquote(title), ".", with, " ",
-      host, ", ", location, ". ", date, "."
+      host, ", ", location, ". ", date, ".", repo_link
     )
   )
 
