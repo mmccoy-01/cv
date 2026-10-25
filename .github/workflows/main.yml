@@ -89,6 +89,7 @@ jobs:
 
       - name: Install LaTeX packages
         run: |
+          tlmgr update --self
           tlmgr install marvosym parskip fancyhdr lastpage xecjk hyperref xcolor
 
       - name: Render PDF
